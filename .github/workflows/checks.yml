@@ -1,0 +1,25 @@
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile project scripts
+        run: python -m py_compile ingest.py ingest_live_snapshot.py choose_hero_courses.py audit_data.py server.py
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+      - name: Install UI-test dependencies
+        run: npm ci
+      - name: Install Chromium for UI tests
+        run: npx playwright install --with-deps chromium
+      - name: Run UI tests
+        run: npm run test:ui

@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: uiuc-course-signal
+    runtime: python
+    buildCommand: python3 ingest.py
+    startCommand: HOST=0.0.0.0 python3 server.py
+    healthCheckPath: /api/health
+    autoDeploy: false
+

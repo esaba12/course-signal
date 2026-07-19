@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UIUC CS Course Signal</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div><p class="eyebrow">HACKATHON PROTOTYPE · PUBLIC DATA</p><h1>UIUC CS <em>Course Signal</em></h1></div>
+      <button id="method-button" class="text-button">How to read this →</button>
+    </header>
+    <section class="controls" aria-label="Course controls">
+      <label>Course <select id="course-select"></select></label>
+      <label>Compare <select id="term-select"><option>Fall</option><option>Spring</option><option>Summer</option><option>Winter</option></select></label>
+      <span id="coverage" class="coverage"></span>
+    </section>
+    <p id="error" class="error" hidden></p>
+    <section class="hero-grid">
+      <article class="chart-card"><div class="card-head"><div><p class="kicker">HISTORICAL SIGNAL</p><h2>Completed-grade headcount</h2></div><span id="course-title"></span></div><div id="chart" role="img" aria-label="Historical course headcount chart"></div><p class="footnote">Observed students receiving a final grade; withdrawals are excluded. Gaps are not zeros.</p></article>
+      <aside class="forecast-card"><p class="kicker">NEXT COMPARABLE TERM</p><div id="forecast"><p class="muted">Loading estimate…</p></div><div class="divider"></div><p class="small">This is a planning signal—not a seat-capacity, waitlist, or autonomous decision tool.</p></aside>
+    </section>
+    <section class="lower-grid">
+      <article class="panel"><p class="kicker">CREDIBILITY CHECK</p><h2>Latest historical backtest</h2><div id="backtest"><p class="muted">Loading…</p></div></article>
+      <article class="panel"><p class="kicker">PRESENT-TENSE OVERLAY</p><h2>Current section status</h2><div id="status"><p class="muted">Loading cached snapshot…</p></div></article>
+    </section>
+    <section id="method" class="method" hidden><button id="close-method" class="close">×</button><h2>What this actually measures</h2><p>Historical values are aggregated public records of students receiving a final grade in a CS course, compared like-for-like by calendar term. The estimate selects the best of three deliberately simple methods using historic backtests. It does not know seats, capacity, waitlists, rooms, staffing, or individual student intent.</p></section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+data/*.db
+data/*.csv
+data/*.xml
+data/cache/
+node_modules/
+playwright-report/
+test-results/
+.DS_Store

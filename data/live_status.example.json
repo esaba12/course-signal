@@ -1,0 +1,10 @@
+{
+  "CS 225": {
+    "fetched_at": "2026-07-17T14:30:00Z",
+    "sections": [
+      {"section": "AL1", "status": "Open"},
+      {"section": "AL2", "status": "Closed"}
+    ]
+  }
+}
+

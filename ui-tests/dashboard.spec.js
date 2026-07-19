@@ -10,7 +10,8 @@ test('CS 225 judge path renders historical signal, estimate, and backtest', asyn
   await expect(page.locator('#coverage')).toContainText('comparable terms');
   await expect(page.locator('#forecast')).toContainText('students');
   await expect(page.locator('#backtest')).toContainText('Observed');
-  await expect(page.getByText(/planning signal—not a seat-capacity/i)).toBeVisible();
+  await expect(page.getByText(/Not a capacity or waitlist forecast/i)).toBeVisible();
+  await expect(page.getByRole('heading', { name: /signal to investigate—not a recommendation to act/i })).toBeVisible();
   await expect(page.locator('#status')).toContainText('No verified cached Course Explorer snapshot');
 
   await expect(page.locator('#chart svg')).toBeVisible();

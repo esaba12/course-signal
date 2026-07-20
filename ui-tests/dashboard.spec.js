@@ -20,7 +20,7 @@ test('CS 225 judge path renders historical signal, estimate, and backtest', asyn
 
 test('method explanation is accessible from the dashboard', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: /How to read this/i }).click();
+  await page.getByRole('button', { name: /How this works/i }).click();
   await expect(page.locator('#method')).toBeVisible();
-  await expect(page.locator('#method')).toContainText('does not know seats');
+  await expect(page.locator('#method')).toContainText('Seats, fill rate, or waitlist size');
 });

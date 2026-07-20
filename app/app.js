@@ -10,8 +10,6 @@ async function api(path) {
   return data;
 }
 
-function termLabel(value) { return value ? value.replace('-', ' ') : 'the selected term'; }
-
 function renderChart(rows) {
   const node = $('chart');
   if (!rows.length) {

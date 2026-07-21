@@ -16,7 +16,8 @@
   "services": {
     "uiuc-course-signal": {
       "root": ".",
-      "buildCommand": "python3 build_vercel.py"
+      "buildCommand": "python3 build_vercel.py",
+      "entrypoint": "api/index.py"
     }
   }
 }

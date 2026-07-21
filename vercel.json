@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "python3 build_vercel.py",
+  "rewrites": [
+    {"source": "/api/(.*)", "destination": "/api/index.py"}
+  ],
+  "functions": {
+    "api/index.py": {
+      "excludeFiles": "{tests/**,ui-tests/**,test-results/**,data/fixtures/**,**/__pycache__/**}"
+    }
+  }
+}

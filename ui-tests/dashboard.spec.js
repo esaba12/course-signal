@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 test('CS 225 judge path renders historical signal, estimate, and backtest', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /UIUC CS Course Signal/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /UIUC Course Signal/i })).toBeVisible();
 
   const course = page.locator('#course-select');
   await expect(course).toBeEnabled();

@@ -3,21 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A transparent planning signal for UIUC CS course completed-grade headcount.">
-  <title>UIUC CS Course Signal</title>
+  <meta name="description" content="A transparent planning signal for course planning conversations.">
+  <title>Course Signal</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip-link" href="#dashboard">Skip to course dashboard</a>
   <main id="dashboard">
     <header class="site-header">
-      <div class="brand"><p class="eyebrow">PUBLIC-DATA HACKATHON PROTOTYPE</p><h1>UIUC CS <em>Course Signal</em></h1><p class="subtitle">A transparent, backtested planning signal for course conversations.</p></div>
+      <div class="brand"><p class="eyebrow">CONFIGURABLE PLANNING SIGNAL</p><h1 id="site-title">Course <em>Signal</em></h1><p id="institution-name" class="subtitle">Loading institution configuration…</p></div>
       <button id="method-button" class="button button-secondary" aria-haspopup="dialog">How this works <span aria-hidden="true">↗</span></button>
     </header>
 
     <section class="control-bar" aria-label="Course controls">
-      <label>Course <select id="course-select" aria-describedby="course-help"></select><span id="course-help" class="sr-only">Choose a UIUC computer science course.</span></label>
-      <label>Compare <select id="term-select"><option>Fall</option><option>Spring</option><option>Summer</option><option>Winter</option></select></label>
+      <label>Course <select id="course-select" aria-describedby="course-help"></select><span id="course-help" class="sr-only">Choose a course.</span></label>
+      <label>Compare <select id="term-select"></select></label>
       <div class="control-context"><span id="coverage" class="coverage">Loading history…</span><span>Comparable terms only</span></div>
     </section>
 
@@ -37,10 +37,10 @@
 
     <section class="dashboard-grid">
       <article class="panel chart-panel">
-        <div class="panel-heading"><div><p class="kicker">HISTORICAL SIGNAL</p><h2>Completed-grade headcount</h2></div><span id="course-title" class="course-title"></span></div>
+        <div class="panel-heading"><div><p class="kicker">HISTORICAL SIGNAL</p><h2 id="measurement-title">Observed headcount</h2></div><span id="course-title" class="course-title"></span></div>
         <p id="chart-summary" class="chart-summary" aria-live="polite">Loading chart summary…</p>
         <div id="chart" role="img" aria-describedby="chart-summary chart-description"></div>
-        <p id="chart-description" class="footnote">Observed students receiving a final grade; withdrawals are excluded. Gaps are not zeros.</p>
+        <p id="chart-description" class="footnote">Observed course-term measurement. Gaps are not zeros.</p>
         <details class="data-details"><summary>View comparable-term values as a table</summary><div id="history-table"></div></details>
       </article>
 

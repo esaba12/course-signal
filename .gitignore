@@ -4,6 +4,7 @@ data/*.db
 data/*.csv
 data/*.xml
 data/cache/
+public/
 node_modules/
 playwright-report/
 test-results/

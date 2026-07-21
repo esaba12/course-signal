@@ -1,6 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const courseSelect = $('course-select');
 const termSelect = $('term-select');
+let institution;
 const escaped = (value) => String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 
 async function api(path) {
@@ -26,12 +27,12 @@ function renderChart(rows) {
     const x = pad + index * band + (band - barWidth) / 2;
     const barHeight = (row.students / max) * (height - pad * 2);
     const y = height - pad - barHeight;
-    return `<rect class="bar ${index === rows.length - 1 ? 'latest' : ''}" x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="3"><title>${escaped(row.year_term)}: ${row.students} students receiving a final grade</title></rect><text class="label" x="${x + barWidth / 2}" y="${height - 12}" text-anchor="middle">${escaped(row.year_term.slice(2))}</text>`;
+    return `<rect class="bar ${index === rows.length - 1 ? 'latest' : ''}" x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="3"><title>${escaped(row.year_term)}: ${row.students} ${escaped(institution.measurement.short_label)}</title></rect><text class="label" x="${x + barWidth / 2}" y="${height - 12}" text-anchor="middle">${escaped(row.year_term.slice(2))}</text>`;
   }).join('');
   node.innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="100%" height="255" aria-hidden="true"><line class="axis" x1="${pad}" x2="${width - pad}" y1="${height - pad}" y2="${height - pad}"/><text class="label" x="${pad}" y="18">Peak: ${Math.round(max / 1.15)} students</text>${bars}</svg>`;
   const first = rows[0], latest = rows.at(-1);
-  $('chart-summary').textContent = `${rows.length} comparable terms, from ${first.year_term} to ${latest.year_term}. Latest observed completed-grade headcount: ${latest.students}.`;
-  $('history-table').innerHTML = `<table class="data-table"><thead><tr><th scope="col">Term</th><th scope="col">Students receiving final grade</th></tr></thead><tbody>${rows.map((row) => `<tr><td>${escaped(row.year_term)}</td><td>${row.students}</td></tr>`).join('')}</tbody></table>`;
+  $('chart-summary').textContent = `${rows.length} comparable terms, from ${first.year_term} to ${latest.year_term}. Latest observed ${institution.measurement.label.toLowerCase()}: ${latest.students}.`;
+  $('history-table').innerHTML = `<table class="data-table"><thead><tr><th scope="col">Term</th><th scope="col">${escaped(institution.measurement.label)}</th></tr></thead><tbody>${rows.map((row) => `<tr><td>${escaped(row.year_term)}</td><td>${row.students}</td></tr>`).join('')}</tbody></table>`;
 }
 
 function renderTrend(rows) {
@@ -46,7 +47,7 @@ function renderTrend(rows) {
   const arrow = direction === 'up' ? '↑' : direction === 'down' ? '↓' : '→';
   const color = direction === 'down' ? 'trend-down' : '';
   const words = direction === 'flat' ? 'unchanged from' : `${percent}% ${direction} from`;
-  $('trend-summary').innerHTML = `<div class="trend-line"><span class="trend-arrow ${color}" aria-hidden="true">${arrow}</span><div class="summary-number">${latest.students}<small> students</small></div></div><p class="summary-meta">${words} ${previous.year_term}. This is observed completed-grade headcount.</p>`;
+  $('trend-summary').innerHTML = `<div class="trend-line"><span class="trend-arrow ${color}" aria-hidden="true">${arrow}</span><div class="summary-number">${latest.students}<small> students</small></div></div><p class="summary-meta">${words} ${previous.year_term}. This is observed ${escaped(institution.measurement.label.toLowerCase())}.</p>`;
 }
 
 function renderForecast(data) {
@@ -68,7 +69,7 @@ function renderStatus(data) {
     $('live-status-detail').textContent = 'No verified snapshot for this course';
     badge.className = 'badge badge-unavailable';
     badge.textContent = 'Unavailable';
-    $('status').innerHTML = `<p class="summary-meta">${escaped(data.message)}</p><p class="summary-meta">The dashboard does not continuously monitor Course Explorer. A verified snapshot will always show its retrieval time.</p>`;
+    $('status').innerHTML = `<p class="summary-meta">${escaped(data.message)}</p><p class="summary-meta">A verified snapshot, when enabled, always shows its retrieval time.</p>`;
     return;
   }
   $('live-dot').className = 'status-dot status-ready';
@@ -92,7 +93,7 @@ function renderFreshness(health) {
 function renderPlanningNote(rows, forecast) {
   const latest = rows.at(-1);
   if (!latest || !forecast.eligible) return;
-  $('planning-note').textContent = `For ${courseSelect.value}, the visible ${termSelect.value}-to-${termSelect.value} history ends at ${latest.students} completed grades. Use the ${forecast.target_year} estimate as a prompt to review curriculum, staffing, rooms, and student-support context—not as an action by itself.`;
+  $('planning-note').textContent = `For ${courseSelect.value}, the visible ${termSelect.value}-to-${termSelect.value} history ends at ${latest.students} ${institution.measurement.short_label}. Use the ${forecast.target_year} estimate as a prompt to review local planning context—not as an action by itself.`;
 }
 
 async function load() {
@@ -122,9 +123,17 @@ async function load() {
 
 async function start() {
   try {
+    [institution] = await Promise.all([api('/api/institution')]);
+    document.title = institution.dashboard_title;
+    $('site-title').innerHTML = `${escaped(institution.dashboard_title.replace(' Course Signal', ''))} <em>Course Signal</em>`;
+    $('institution-name').textContent = institution.name;
+    $('course-help').textContent = `Choose a course at ${institution.name}.`;
+    $('measurement-title').textContent = institution.measurement.label;
+    $('chart-description').textContent = institution.measurement.description;
+    termSelect.innerHTML = institution.terms.map((term) => `<option>${escaped(term)}</option>`).join('');
     const courses = await api('/api/courses');
     courseSelect.innerHTML = courses.map((course) => `<option value="${escaped(course.code)}">${escaped(course.code)} — ${escaped(course.title || 'Course')}</option>`).join('');
-    const preferred = courses.find((course) => course.code === 'CS 225');
+    const preferred = courses.find((course) => course.code === institution.default_course);
     if (preferred) courseSelect.value = preferred.code;
     await load();
   } catch (error) {

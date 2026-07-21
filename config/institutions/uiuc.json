@@ -1,0 +1,19 @@
+{
+  "id": "uiuc",
+  "name": "University of Illinois Urbana-Champaign",
+  "dashboard_title": "UIUC Course Signal",
+  "database": "data/course_signal.db",
+  "default_course": "CS 225",
+  "terms": ["Fall", "Spring", "Summer", "Winter"],
+  "measurement": {
+    "label": "Completed-grade headcount",
+    "short_label": "students receiving a final grade",
+    "description": "Observed students receiving a final grade; withdrawals are excluded."
+  },
+  "source": {
+    "adapter": "uiuc_gpa_csv",
+    "path": "data/uiuc-gpa-dataset.csv",
+    "url": "https://raw.githubusercontent.com/wadefagen/datasets/main/gpa/uiuc-gpa-dataset.csv"
+  },
+  "capabilities": {"current_status": true}
+}

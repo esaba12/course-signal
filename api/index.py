@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from flask import Flask, jsonify, send_from_directory
+from urllib.parse import unquote
 
 import server
 
@@ -48,15 +49,15 @@ def courses():
 @app.get("/api/courses/<path:code>/history")
 def history(code: str):
     from flask import request
-    return jsonify(server.course_rows(code, request.args.get("term", server.INSTITUTION["terms"][0])))
+    return jsonify(server.course_rows(unquote(code), request.args.get("term", server.INSTITUTION["terms"][0])))
 
 
 @app.get("/api/courses/<path:code>/forecast")
 def forecast(code: str):
     from flask import request
-    return jsonify(server.forecast_payload(code, request.args.get("term", server.INSTITUTION["terms"][0])))
+    return jsonify(server.forecast_payload(unquote(code), request.args.get("term", server.INSTITUTION["terms"][0])))
 
 
 @app.get("/api/courses/<path:code>/live-status")
 def live_status(code: str):
-    return jsonify(server.live_status(code))
+    return jsonify(server.live_status(unquote(code)))

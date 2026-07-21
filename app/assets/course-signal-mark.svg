@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Course Signal mark</title>
+  <desc id="desc">Two signal arcs frame a rising three-point course pathway.</desc>
+  <path d="M18 47C27 28 47 16 69 16" fill="none" stroke="#16212C" stroke-width="9" stroke-linecap="round"/>
+  <path d="M17 68C24 49 42 36 64 35" fill="none" stroke="#006B82" stroke-width="9" stroke-linecap="round"/>
+  <path d="M31 94C45 86 58 76 70 66C79 59 86 53 97 46" fill="none" stroke="#F65F0A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="31" cy="94" r="9" fill="#16212C"/>
+  <circle cx="70" cy="66" r="9" fill="#006B82"/>
+  <circle cx="97" cy="46" r="9" fill="#F65F0A"/>
+</svg>

@@ -2,11 +2,23 @@
 
 from __future__ import annotations
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 
 import server
 
 app = Flask(__name__)
+
+
+@app.get("/")
+def dashboard():
+    return send_from_directory(server.APP_DIR, "index.html")
+
+
+@app.get("/<path:filename>")
+def asset(filename: str):
+    if filename in {"app.js", "styles.css"}:
+        return send_from_directory(server.APP_DIR, filename)
+    return ("Not found", 404)
 
 
 @app.get("/api/health")

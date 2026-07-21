@@ -128,6 +128,8 @@ class Handler(SimpleHTTPRequestHandler):
         parsed = urlparse(self.path)
         if not parsed.path.startswith("/api/"):
             if parsed.path == "/":
+                self.path = "/landing.html"
+            elif parsed.path == "/dashboard.html":
                 self.path = "/index.html"
             return super().do_GET()
         try:

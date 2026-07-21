@@ -43,10 +43,9 @@ function initEntry() {
   });
   setTheme(localStorage.getItem('course-signal-theme') || 'signal');
 
-  const entry = $('entry-screen');
-  const enterDemo = () => { entry.classList.add('is-hidden'); entry.setAttribute('aria-hidden', 'true'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const enterDemo = () => { window.location.assign('/dashboard.html'); };
   $('enter-demo').addEventListener('click', enterDemo);
-  $('continue-demo').addEventListener('click', () => { closeDialog('access-dialog'); $('access-confirmation').hidden = false; enterDemo(); });
+  $('continue-demo').addEventListener('click', enterDemo);
   $('open-access').addEventListener('click', () => $('access-dialog').showModal());
   $('open-request').addEventListener('click', () => $('request-dialog').showModal());
   $('open-intake').addEventListener('click', () => $('intake-dialog').showModal());
@@ -247,14 +246,20 @@ async function start() {
   } catch (error) { $('error').hidden = false; $('error').textContent = `Setup required: ${error.message}`; }
 }
 
-courseSelect.addEventListener('change', load);
-termSelect.addEventListener('change', load);
-courseSearch.addEventListener('input', renderCourseSearch);
-$('course-results').addEventListener('click', event => { const button = event.target.closest('[data-course]'); if (!button) return; const code = button.dataset.course; if (!state.selected.includes(code)) state.selected.push(code); courseSearch.value = ''; renderCourseSearch(); renderChips(); load(); });
-$('compare-chips').addEventListener('click', event => { const focus = event.target.closest('[data-focus]'); const remove = event.target.closest('[data-remove]'); if (focus) { courseSelect.value = focus.dataset.focus; load(); } if (remove) { state.selected = state.selected.filter(code => code !== remove.dataset.remove); renderChips(); renderComparison(); } });
-$('copy-link').addEventListener('click', async () => { updateUrl(); await navigator.clipboard.writeText(location.href); $('copy-link').textContent = 'Link copied'; setTimeout(() => { $('copy-link').textContent = 'Copy view link'; }, 1600); });
-$('export-csv').addEventListener('click', exportCsv);
-$('method-button').addEventListener('click', () => $('method').showModal()); $('close-method').addEventListener('click', () => $('method').close());
-$('close-review').addEventListener('click', () => $('review-dialog').close()); $('save-review').addEventListener('click', saveReview);
-initEntry();
-start();
+if (document.body.classList.contains('landing-page')) {
+  initEntry();
+}
+
+if (courseSelect) {
+  setTheme(localStorage.getItem('course-signal-theme') || 'signal');
+  courseSelect.addEventListener('change', load);
+  termSelect.addEventListener('change', load);
+  courseSearch.addEventListener('input', renderCourseSearch);
+  $('course-results').addEventListener('click', event => { const button = event.target.closest('[data-course]'); if (!button) return; const code = button.dataset.course; if (!state.selected.includes(code)) state.selected.push(code); courseSearch.value = ''; renderCourseSearch(); renderChips(); load(); });
+  $('compare-chips').addEventListener('click', event => { const focus = event.target.closest('[data-focus]'); const remove = event.target.closest('[data-remove]'); if (focus) { courseSelect.value = focus.dataset.focus; load(); } if (remove) { state.selected = state.selected.filter(code => code !== remove.dataset.remove); renderChips(); renderComparison(); } });
+  $('copy-link').addEventListener('click', async () => { updateUrl(); await navigator.clipboard.writeText(location.href); $('copy-link').textContent = 'Link copied'; setTimeout(() => { $('copy-link').textContent = 'Copy view link'; }, 1600); });
+  $('export-csv').addEventListener('click', exportCsv);
+  $('method-button').addEventListener('click', () => $('method').showModal()); $('close-method').addEventListener('click', () => $('method').close());
+  $('close-review').addEventListener('click', () => $('review-dialog').close()); $('save-review').addEventListener('click', saveReview);
+  start();
+}

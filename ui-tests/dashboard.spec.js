@@ -1,8 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
 async function enterDemo(page) {
-  await page.getByRole('button', { name: /Explore the UIUC demo/i }).click();
-  await expect(page.locator('#entry-screen')).toHaveClass(/is-hidden/);
+  await page.goto('/dashboard.html');
+  await expect(page).toHaveURL(/dashboard\.html/);
 }
 
 test('public entry screen offers UIUC demo, themes, and intake links', async ({ page }) => {
@@ -24,6 +24,11 @@ test('public entry screen offers UIUC demo, themes, and intake links', async ({ 
   await page.locator('#request-email').fill('alex@example.edu');
   await page.getByRole('button', { name: /Send request/i }).click();
   await expect(page.locator('#request-confirmation')).toBeVisible();
+  await page.getByRole('button', { name: /Close request form/i }).click();
+
+  await page.getByRole('button', { name: /Explore the UIUC demo/i }).click();
+  await expect(page).toHaveURL(/dashboard\.html/);
+  await expect(page.locator('#entry-screen')).toHaveCount(0);
 });
 
 test('configured institution path renders historical signal, estimate, and backtest', async ({ page }) => {

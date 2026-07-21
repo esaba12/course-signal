@@ -12,6 +12,11 @@ app = Flask(__name__)
 
 @app.get("/")
 def dashboard():
+    return send_from_directory(server.APP_DIR, "landing.html")
+
+
+@app.get("/dashboard.html")
+def dashboard_page():
     return send_from_directory(server.APP_DIR, "index.html")
 
 

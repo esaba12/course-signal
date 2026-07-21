@@ -9,6 +9,8 @@ Course Signal deploys to Vercel as static dashboard assets plus one Flask server
 3. For the UIUC demo, leave `COURSE_SIGNAL_INSTITUTION` unset (it defaults to `uiuc`).
 4. Deploy and verify `/api/health`, `/api/institution`, and the dashboard.
 
+The current public demo alias is [course-signal-demo.vercel.app](https://course-signal-demo.vercel.app). The shorter `course-signal.vercel.app` hostname belongs to an unrelated project and must not be used.
+
 For a different configured institution, set `COURSE_SIGNAL_INSTITUTION` in Vercel's project environment before deploying. Its configured source must be available during the build. Do not place protected registrar data in Git; use an approved build-time retrieval mechanism and Vercel environment secrets.
 
 ## Local Vercel check

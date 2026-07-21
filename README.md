@@ -39,6 +39,8 @@ For a local-first demo and hosted backup plan, see [deployment](docs/DEPLOYMENT.
 
 For a Vercel serverless deployment, see [Vercel deployment](docs/VERCEL.md).
 
+Public demo: [course-signal-demo.vercel.app](https://course-signal-demo.vercel.app) (UIUC is explicitly configured as the demo adapter).
+
 Before presenting, run `python3 audit_data.py` and use the [demo checklist](docs/DEMO-CHECKLIST.md).
 
 Use the [institution onboarding guide](docs/INSTITUTION-ONBOARDING.md) with registrars and planners before adding an institution. The [customer-discovery guide](docs/CUSTOMER-DISCOVERY.md) helps establish the decision workflow first.

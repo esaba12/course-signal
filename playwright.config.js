@@ -12,10 +12,9 @@ module.exports = defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: 'python3 ingest.py && HOST=127.0.0.1 python3 server.py',
+    command: 'python3 ingest.py --institution riverview-demo && COURSE_SIGNAL_INSTITUTION=riverview-demo HOST=127.0.0.1 python3 server.py',
     url: 'http://127.0.0.1:8000/api/health',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000
   }
 });
-

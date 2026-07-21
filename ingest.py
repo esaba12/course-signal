@@ -122,7 +122,7 @@ def build_database(config: dict) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--institution", default="uiuc", help="Configuration name in config/institutions (default: uiuc)")
+    parser.add_argument("--institution", default="riverview-demo", help="Configuration name in config/institutions (default: riverview-demo)")
     parser.add_argument("--refresh", action="store_true", help="Redownload a remote source before ingesting")
     args = parser.parse_args()
     try:

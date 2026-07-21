@@ -9,12 +9,12 @@
       "source": "/(.*)",
       "destination": {
         "type": "service",
-        "service": "uiuc-course-signal"
+      "service": "course-signal"
       }
     }
   ],
   "services": {
-    "uiuc-course-signal": {
+    "course-signal": {
       "root": ".",
       "buildCommand": "python3 build_vercel.py",
       "entrypoint": "api/index.py"

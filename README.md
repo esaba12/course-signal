@@ -1,6 +1,6 @@
 # Course Signal
 
-A configurable, per-institution planning-signal prototype. The included UIUC deployment explores historical course **completed-grade headcount** over comparable terms; a second fixture-backed configuration demonstrates that the core is not UIUC-specific.
+A configurable, per-institution planning-signal prototype. UIUC is the demo data adapter; the product identity and deployment are institution-neutral.
 
 ## Important scope
 

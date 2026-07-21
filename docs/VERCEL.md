@@ -1,6 +1,6 @@
 # Vercel deployment
 
-Course Signal deploys to Vercel as static dashboard assets plus one Flask serverless function. The deployment database is read-only and is rebuilt during Vercel's build phase for the selected institution.
+Course Signal deploys to Vercel as static dashboard assets plus one Flask serverless function. The deployment database is read-only and is rebuilt during Vercel's build phase for the selected institution. UIUC is only the default demo configuration.
 
 ## First deployment
 

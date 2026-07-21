@@ -5,7 +5,7 @@ Run this in a normal browser on the laptop that will present the demo.
 ## Desktop check
 
 1. Open `http://localhost:8000` after running the server.
-2. Confirm the title reads “UIUC CS Course Signal” and the orange emphasis is readable.
+2. Confirm the title reads “Course Signal” (with the configured institution shown beneath it) and the orange emphasis is readable.
 3. Choose CS 225 and Fall. Confirm chart, estimate, and latest backtest are visible without scrolling the first screen on a typical laptop.
 4. Change to Spring and then to CS 173. Confirm no stale course/title/chart data remains.
 5. Click “How to read this” and confirm the explanatory panel can be closed.
@@ -27,4 +27,3 @@ Run this in a normal browser on the laptop that will present the demo.
 ## Capture for the submission
 
 Take one clean desktop screenshot of the CS 225 Fall screen. It should show the chart, estimate, backtest, and guardrail sentence. Do not screenshot an unavailable status panel unless you are explicitly discussing the integration limitation.
-

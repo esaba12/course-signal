@@ -1,0 +1,23 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+      "service": "course-signal"
+      }
+    }
+  ],
+  "services": {
+    "course-signal": {
+      "root": ".",
+      "buildCommand": "python3 build_vercel.py",
+      "entrypoint": "api/index.py"
+    }
+  }
+}

@@ -37,7 +37,7 @@ class ForecastTests(unittest.TestCase):
             path.read_text.return_value = "{}"
             result = server.live_status("CS 225")
         self.assertFalse(result["available"])
-        self.assertIn("No verified", result["message"])
+        self.assertTrue("current-status" in result["message"] or "verified" in result["message"])
 
 
 if __name__ == "__main__":

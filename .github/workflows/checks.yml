@@ -14,7 +14,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Compile project scripts
-        run: python -m py_compile ingest.py ingest_live_snapshot.py choose_hero_courses.py audit_data.py server.py
+        run: python -m py_compile ingest.py ingest_live_snapshot.py choose_hero_courses.py audit_data.py server.py institutions.py validate_institution.py api/index.py
+      - name: Build neutral fixture database
+        run: python ingest.py --institution riverview-demo
       - name: Run tests
         run: python -m unittest discover -s tests -v
       - name: Install UI-test dependencies

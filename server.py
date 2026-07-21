@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dependency-free API and static server for the UIUC CS Course Signal prototype."""
+"""Dependency-free API and static server for a configured Course Signal deployment."""
 
 from __future__ import annotations
 
@@ -9,14 +9,14 @@ import os
 import sqlite3
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
-ROOT = Path(__file__).parent
-DB_PATH = ROOT / "data" / "course_signal.db"
+from institutions import ROOT, database_path, load_institution
+
+INSTITUTION = load_institution()
+DB_PATH = database_path(INSTITUTION)
 LIVE_STATUS_PATH = ROOT / "data" / "live_status.json"
 APP_DIR = ROOT / "app"
-TERM_ORDER = {"Spring": 0, "Summer": 1, "Fall": 2, "Winter": 3}
 
 
 def connection() -> sqlite3.Connection:
@@ -28,15 +28,14 @@ def connection() -> sqlite3.Connection:
 
 
 def course_rows(code: str, term: str | None = None) -> list[dict]:
-    number = code.upper().replace("CS", "").strip()
-    query = "SELECT * FROM course_term_aggregate WHERE subject='CS' AND course_number=?"
-    params: list[str] = [number]
+    query = "SELECT * FROM course_term_aggregate WHERE institution_id=? AND course_code=?"
+    params: list[str] = [INSTITUTION["id"], code.upper().strip()]
     if term:
         query += " AND term=?"
         params.append(term)
     query += " ORDER BY year, CASE term WHEN 'Spring' THEN 0 WHEN 'Summer' THEN 1 WHEN 'Fall' THEN 2 ELSE 3 END"
     with connection() as db:
-        return [dict(row) for row in db.execute(query, params)]
+        return [{**dict(row), "students": row["headcount"]} for row in db.execute(query, params)]
 
 
 def linear_predict(rows: list[dict], target_year: int) -> float:
@@ -86,7 +85,7 @@ def forecast_payload(code: str, term: str) -> dict:
     prediction = max(0, round(MODELS[model_name](rows, target_year)))
     return {
         "eligible": True,
-        "course": f"CS {rows[0]['course_number']}",
+        "course": rows[0]["course_code"],
         "term": term,
         "target_year": target_year,
         "estimate": prediction,
@@ -99,13 +98,15 @@ def forecast_payload(code: str, term: str) -> dict:
 
 
 def live_status(code: str) -> dict:
+    if not INSTITUTION.get("capabilities", {}).get("current_status"):
+        return {"available": False, "message": f"{INSTITUTION['name']} has not enabled a current-status connector. Historical planning signals remain available."}
     if not LIVE_STATUS_PATH.exists():
-        return {"available": False, "message": "No cached Course Explorer snapshot has been loaded yet. The historical dashboard remains fully usable."}
+        return {"available": False, "message": "No verified current-status snapshot has been loaded yet. The historical dashboard remains fully usable."}
     try:
         snapshot = json.loads(LIVE_STATUS_PATH.read_text())
         course_snapshot = snapshot.get(code.upper()) if isinstance(snapshot, dict) else None
         if not isinstance(course_snapshot, dict):
-            return {"available": False, "message": "No verified cached Course Explorer snapshot is loaded for this course."}
+            return {"available": False, "message": "No verified current-status snapshot is loaded for this course."}
         return {"available": True, **course_snapshot}
     except (json.JSONDecodeError, OSError):
         return {"available": False, "message": "Cached status snapshot could not be read."}
@@ -134,15 +135,17 @@ class Handler(SimpleHTTPRequestHandler):
             if parsed.path == "/api/health":
                 with connection() as db:
                     run = dict(db.execute("SELECT * FROM ingestion_run ORDER BY id DESC LIMIT 1").fetchone())
-                return self.send_json({"ok": True, "ingestion": run})
+                return self.send_json({"ok": True, "institution": INSTITUTION["id"], "ingestion": run})
+            if parsed.path == "/api/institution":
+                return self.send_json({key: INSTITUTION[key] for key in ("id", "name", "dashboard_title", "measurement", "source", "terms", "default_course", "capabilities")})
             if parsed.path == "/api/courses":
                 with connection() as db:
-                    rows = db.execute("SELECT course_number, MAX(course_title) AS title, COUNT(*) AS term_count FROM course_term_aggregate GROUP BY course_number ORDER BY CAST(course_number AS INTEGER)").fetchall()
-                return self.send_json([{"code": f"CS {row['course_number']}", "title": row["title"], "term_count": row["term_count"]} for row in rows])
+                    rows = db.execute("SELECT course_code, MAX(course_title) AS title, COUNT(*) AS term_count FROM course_term_aggregate WHERE institution_id=? GROUP BY course_code ORDER BY course_code", (INSTITUTION["id"],)).fetchall()
+                return self.send_json([{"code": row["course_code"], "title": row["title"], "term_count": row["term_count"]} for row in rows])
             parts = parsed.path.strip("/").split("/")
             if len(parts) == 4 and parts[1] == "courses":
                 code, action = unquote(parts[2]), parts[3]
-                term = params.get("term", ["Fall"])[0]
+                term = params.get("term", [INSTITUTION["terms"][0]])[0]
                 if action == "history":
                     return self.send_json(course_rows(code, term))
                 if action == "forecast":
@@ -160,7 +163,7 @@ def main() -> None:
     port = int(os.environ.get("PORT", "8000"))
     host = os.environ.get("HOST", "127.0.0.1")
     server = ThreadingHTTPServer((host, port), Handler)
-    print(f"UIUC CS Course Signal: http://{host}:{port}")
+    print(f"{INSTITUTION['dashboard_title']}: http://{host}:{port}")
     server.serve_forever()
 
 

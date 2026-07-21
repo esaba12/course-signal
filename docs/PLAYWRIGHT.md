@@ -1,6 +1,6 @@
 # Playwright UI Tests
 
-Playwright gives the team a repeatable browser-level check of the judge path. It confirms the dashboard renders, CS 225 can be selected, the chart/forecast/backtest appear, the guardrail is visible, and the method explainer opens.
+Playwright gives the team a repeatable browser-level check of the configured-institution path. It confirms the dashboard renders, the configured default course loads, the chart/forecast/backtest appear, the guardrail is visible, and the method explainer opens.
 
 ## First-time setup
 
@@ -15,7 +15,7 @@ npx playwright install chromium
 npm run test:ui
 ```
 
-The test starts the local Python server automatically when one is not already running. On success, it saves a screenshot at `test-results/cs-225-judge-path.png`; the folder is ignored by git.
+The test starts the local Python server automatically when one is not already running. On success, it saves a configured-institution screenshot under `test-results/`; the folder is ignored by git.
 
 ## Headed visual check
 

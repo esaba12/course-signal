@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a reproducible SQLite database from the public UIUC GPA dataset."""
+"""Build an isolated Course Signal database from an institution adapter."""
 
 from __future__ import annotations
 
@@ -11,113 +11,125 @@ import sys
 import urllib.request
 from collections import defaultdict
 from datetime import UTC, datetime
-from pathlib import Path
 
-ROOT = Path(__file__).parent
-DATA_DIR = ROOT / "data"
-CSV_PATH = DATA_DIR / "uiuc-gpa-dataset.csv"
-DB_PATH = DATA_DIR / "course_signal.db"
-SOURCE_URL = "https://raw.githubusercontent.com/wadefagen/datasets/main/gpa/uiuc-gpa-dataset.csv"
-REQUIRED_COLUMNS = {"Year", "Term", "YearTerm", "Subject", "Number", "Course Title", "Students"}
+from institutions import database_path, load_institution, source_path
 
 
-def download_csv(force: bool) -> None:
-    DATA_DIR.mkdir(exist_ok=True)
-    if CSV_PATH.exists() and not force:
-        print(f"Using cached source: {CSV_PATH}")
+def download_source(config: dict, force: bool) -> None:
+    source = config["source"]
+    path = source_path(config)
+    if source["adapter"] != "uiuc_gpa_csv":
         return
-    print(f"Downloading public source: {SOURCE_URL}")
-    request = urllib.request.Request(SOURCE_URL, headers={"User-Agent": "UIUC-Course-Signal-Hackathon/0.1"})
-    with urllib.request.urlopen(request, timeout=90) as response, CSV_PATH.open("wb") as out:
+    path.parent.mkdir(exist_ok=True)
+    if path.exists() and not force:
+        print(f"Using cached source: {path}")
+        return
+    print(f"Downloading public source: {source['url']}")
+    request = urllib.request.Request(source["url"], headers={"User-Agent": "Course-Signal/0.2"})
+    with urllib.request.urlopen(request, timeout=90) as response, path.open("wb") as out:
         out.write(response.read())
-    print(f"Saved {CSV_PATH}")
 
 
-def build_database() -> None:
-    with CSV_PATH.open("r", encoding="utf-8-sig", newline="") as source:
+def uiuc_rows(path):
+    required = {"Year", "Term", "YearTerm", "Subject", "Number", "Course Title", "Students"}
+    with path.open("r", encoding="utf-8-sig", newline="") as source:
         reader = csv.DictReader(source)
-        headers = set(reader.fieldnames or [])
-        missing = REQUIRED_COLUMNS - headers
+        missing = required - set(reader.fieldnames or [])
         if missing:
-            raise ValueError(f"Unexpected source format. Missing columns: {sorted(missing)}")
-
-        aggregates: dict[tuple[str, str, int, str, str], dict[str, object]] = {}
-        skipped = 0
+            raise ValueError(f"Unexpected UIUC source format. Missing columns: {sorted(missing)}")
         for row in reader:
-            if (row.get("Subject") or "").strip().upper() != "CS":
+            subject = (row.get("Subject") or "").strip().upper()
+            number = (row.get("Number") or "").strip()
+            term = (row.get("Term") or "").strip()
+            year_term = (row.get("YearTerm") or "").strip()
+            if not (subject and number and term and year_term):
                 continue
             try:
-                year = int((row.get("Year") or "").strip())
-                students = int(float((row.get("Students") or "").strip()))
+                yield {"year": int((row.get("Year") or "").strip()), "term": term, "year_term": year_term,
+                       "subject": subject, "course_number": number, "course_code": f"{subject} {number}",
+                       "course_title": (row.get("Course Title") or "").strip(), "headcount": int(float((row.get("Students") or "").strip()))}
             except ValueError:
-                skipped += 1
                 continue
-            term = (row.get("Term") or "").strip()
-            number = (row.get("Number") or "").strip()
-            title = (row.get("Course Title") or "").strip()
-            year_term = (row.get("YearTerm") or "").strip()
-            if not (term and number and year_term):
-                skipped += 1
-                continue
-            key = ("CS", number, year, term, year_term)
-            record = aggregates.setdefault(key, {"title": title, "students": 0, "section_rows": 0})
-            record["students"] = int(record["students"]) + students
-            record["section_rows"] = int(record["section_rows"]) + 1
 
-    source_hash = hashlib.sha256(CSV_PATH.read_bytes()).hexdigest()
-    fetched_at = datetime.now(UTC).isoformat()
-    connection = sqlite3.connect(DB_PATH)
-    try:
-        connection.executescript(
-            """
+
+def canonical_rows(path):
+    required = {"year", "term", "year_term", "subject", "course_number", "course_code", "course_title", "headcount"}
+    with path.open(newline="", encoding="utf-8") as source:
+        reader = csv.DictReader(source)
+        missing = required - set(reader.fieldnames or [])
+        if missing:
+            raise ValueError(f"Canonical source is missing columns: {sorted(missing)}")
+        for row in reader:
+            try:
+                yield {key: row[key].strip() for key in required - {"year", "headcount"}} | {"year": int(row["year"]), "headcount": int(row["headcount"])}
+            except (KeyError, ValueError, AttributeError):
+                continue
+
+
+def adapter_rows(config: dict):
+    path = source_path(config)
+    if not path.exists():
+        raise FileNotFoundError(f"Source missing: {path}")
+    adapter = config["source"]["adapter"]
+    if adapter == "uiuc_gpa_csv":
+        return uiuc_rows(path)
+    if adapter == "canonical_csv":
+        return canonical_rows(path)
+    raise ValueError(f"Unsupported source adapter: {adapter}")
+
+
+def build_database(config: dict) -> None:
+    aggregates: dict[tuple[str, str], dict] = {}
+    skipped = 0
+    for row in adapter_rows(config):
+        if row["headcount"] < 0:
+            skipped += 1
+            continue
+        key = (row["course_code"], row["year_term"])
+        record = aggregates.setdefault(key, row | {"headcount": 0, "source_row_count": 0})
+        record["headcount"] += row["headcount"]
+        record["source_row_count"] += 1
+    if not aggregates:
+        raise ValueError("No usable course-term records were supplied by this adapter.")
+    path = source_path(config)
+    source_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+    db_path = database_path(config)
+    db_path.parent.mkdir(exist_ok=True)
+    with sqlite3.connect(db_path) as db:
+        db.executescript("""
             DROP TABLE IF EXISTS course_term_aggregate;
             DROP TABLE IF EXISTS ingestion_run;
             CREATE TABLE course_term_aggregate (
-                subject TEXT NOT NULL,
-                course_number TEXT NOT NULL,
-                course_title TEXT,
-                year INTEGER NOT NULL,
-                term TEXT NOT NULL,
-                year_term TEXT NOT NULL,
-                students INTEGER NOT NULL,
-                source_row_count INTEGER NOT NULL,
-                PRIMARY KEY (subject, course_number, year_term)
+                institution_id TEXT NOT NULL, course_code TEXT NOT NULL, subject TEXT NOT NULL,
+                course_number TEXT NOT NULL, course_title TEXT, year INTEGER NOT NULL, term TEXT NOT NULL,
+                year_term TEXT NOT NULL, headcount INTEGER NOT NULL, source_row_count INTEGER NOT NULL,
+                PRIMARY KEY (institution_id, course_code, year_term)
             );
             CREATE TABLE ingestion_run (
-                id INTEGER PRIMARY KEY,
-                source_url TEXT NOT NULL,
-                source_sha256 TEXT NOT NULL,
-                ingested_at TEXT NOT NULL,
-                cs_course_term_rows INTEGER NOT NULL,
+                id INTEGER PRIMARY KEY, institution_id TEXT NOT NULL, source_url TEXT NOT NULL,
+                source_sha256 TEXT NOT NULL, ingested_at TEXT NOT NULL, course_term_rows INTEGER NOT NULL,
                 skipped_rows INTEGER NOT NULL
             );
-            """
-        )
-        rows = [
-            (subject, number, values["title"], year, term, year_term, values["students"], values["section_rows"])
-            for (subject, number, year, term, year_term), values in aggregates.items()
-        ]
-        connection.executemany(
-            "INSERT INTO course_term_aggregate VALUES (?, ?, ?, ?, ?, ?, ?, ?)", rows
-        )
-        connection.execute(
-            "INSERT INTO ingestion_run (source_url, source_sha256, ingested_at, cs_course_term_rows, skipped_rows) VALUES (?, ?, ?, ?, ?)",
-            (SOURCE_URL, source_hash, fetched_at, len(rows), skipped),
-        )
-        connection.commit()
-    finally:
-        connection.close()
-    print(f"Built {DB_PATH}: {len(aggregates):,} CS course-term aggregates; skipped {skipped:,} malformed/missing rows.")
+        """)
+        db.executemany("INSERT INTO course_term_aggregate VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+            (config["id"], row["course_code"], row["subject"], row["course_number"], row["course_title"], row["year"], row["term"], row["year_term"], row["headcount"], row["source_row_count"])
+            for row in aggregates.values()
+        ])
+        db.execute("INSERT INTO ingestion_run (institution_id, source_url, source_sha256, ingested_at, course_term_rows, skipped_rows) VALUES (?, ?, ?, ?, ?, ?)",
+                   (config["id"], config["source"]["url"], source_hash, datetime.now(UTC).isoformat(), len(aggregates), skipped))
+    print(f"Built {db_path}: {len(aggregates):,} {config['id']} course-term aggregates; skipped {skipped:,} rows.")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--refresh", action="store_true", help="redownload the public source before ingesting")
+    parser.add_argument("--institution", default="uiuc", help="Configuration name in config/institutions (default: uiuc)")
+    parser.add_argument("--refresh", action="store_true", help="Redownload a remote source before ingesting")
     args = parser.parse_args()
     try:
-        download_csv(args.refresh)
-        build_database()
-    except Exception as error:  # concise terminal message for first-time builders
+        config = load_institution(args.institution)
+        download_source(config, args.refresh)
+        build_database(config)
+    except Exception as error:
         print(f"Ingestion failed: {error}", file=sys.stderr)
         return 1
     return 0
@@ -125,4 +137,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

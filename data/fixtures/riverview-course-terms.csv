@@ -1,0 +1,13 @@
+year,term,year_term,subject,course_number,course_code,course_title,headcount
+2020,Fall,2020-fa,MATH,101,MATH 101,College Algebra,84
+2021,Fall,2021-fa,MATH,101,MATH 101,College Algebra,91
+2022,Fall,2022-fa,MATH,101,MATH 101,College Algebra,96
+2023,Fall,2023-fa,MATH,101,MATH 101,College Algebra,103
+2024,Fall,2024-fa,MATH,101,MATH 101,College Algebra,108
+2025,Fall,2025-fa,MATH,101,MATH 101,College Algebra,112
+2020,Spring,2020-sp,ENG,201,ENG 201,Academic Writing,71
+2021,Spring,2021-sp,ENG,201,ENG 201,Academic Writing,74
+2022,Spring,2022-sp,ENG,201,ENG 201,Academic Writing,70
+2023,Spring,2023-sp,ENG,201,ENG 201,Academic Writing,77
+2024,Spring,2024-sp,ENG,201,ENG 201,Academic Writing,81
+2025,Spring,2025-sp,ENG,201,ENG 201,Academic Writing,84

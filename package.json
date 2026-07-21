@@ -1,5 +1,5 @@
 {
-  "name": "uiuc-course-signal",
+  "name": "course-signal",
   "private": true,
   "version": "0.1.0",
   "scripts": {
@@ -11,4 +11,3 @@
     "@playwright/test": "^1.58.0"
   }
 }
-

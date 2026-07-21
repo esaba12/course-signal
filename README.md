@@ -1,6 +1,6 @@
-# UIUC CS Course Signal
+# Course Signal
 
-A five-day hackathon prototype for exploring UIUC CS course **completed-grade headcount** over comparable terms. It combines public historical data with a cache-ready current section-status panel.
+A configurable, per-institution planning-signal prototype. UIUC is the demo data adapter; the product identity and deployment are institution-neutral.
 
 ## Important scope
 
@@ -9,13 +9,13 @@ This is an advisor-facing planning signal—not a capacity forecast, waitlist pr
 ## Run locally
 
 ```bash
-python3 ingest.py
+python3 ingest.py --institution uiuc
 python3 server.py
 ```
 
 Then visit `http://localhost:8000`.
 
-`ingest.py` downloads the public GPA dataset on its first run and builds `data/course_signal.db`. Subsequent runs use the cached CSV unless `--refresh` is supplied. The live-status importer follows the same cache-first principle and only retrieves one explicitly requested course snapshot.
+`ingest.py` downloads the UIUC GPA dataset on its first run and builds an institution-isolated database. Subsequent runs use the cached CSV unless `--refresh` is supplied. To verify the portable reference deployment, run `python3 validate_institution.py --institution riverview-demo` and `python3 ingest.py --institution riverview-demo`, then start with `COURSE_SIGNAL_INSTITUTION=riverview-demo python3 server.py`.
 
 ## Data credits
 
@@ -24,7 +24,8 @@ Then visit `http://localhost:8000`.
 
 ## Project map
 
-- `ingest.py` — download, validate, aggregate, and store public historical data.
+- `config/institutions/` — isolated institution configuration and source/measurement definitions.
+- `ingest.py` — adapter-driven download, validation, aggregation, and storage.
 - `ingest_live_snapshot.py` — validates a deliberately cached, reviewed status snapshot.
 - `server.py` — dependency-free local API and dashboard server.
 - `app/` — one-screen dashboard.
@@ -36,8 +37,14 @@ Useful companion docs: [data dictionary](docs/DATA-DICTIONARY.md), [pitch](docs/
 
 For a local-first demo and hosted backup plan, see [deployment](docs/DEPLOYMENT.md).
 
+For a Vercel serverless deployment, see [Vercel deployment](docs/VERCEL.md).
+
+Public demo: [course-signal-demo.vercel.app](https://course-signal-demo.vercel.app) (UIUC is explicitly configured as the demo adapter).
+
 Before presenting, run `python3 audit_data.py` and use the [demo checklist](docs/DEMO-CHECKLIST.md).
 
-After the hackathon, use the [customer-discovery guide](docs/CUSTOMER-DISCOVERY.md) before expanding data access or building institutional integrations.
+Use the [institution onboarding guide](docs/INSTITUTION-ONBOARDING.md) with registrars and planners before adding an institution. The [customer-discovery guide](docs/CUSTOMER-DISCOVERY.md) helps establish the decision workflow first.
+
+For the product story and the reason UIUC appears in the demo, see [product pitch](docs/PRODUCT-PITCH.md) and [UIUC demo adapter](docs/UIUC-DEMO.md).
 
 For automated browser QA, see [Playwright tests](docs/PLAYWRIGHT.md).

@@ -3,32 +3,67 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>UIUC CS Course Signal</title>
+  <meta name="description" content="A transparent planning signal for course planning conversations.">
+  <title>Course Signal</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main>
-    <header>
-      <div><p class="eyebrow">HACKATHON PROTOTYPE · PUBLIC DATA</p><h1>UIUC CS <em>Course Signal</em></h1></div>
-      <button id="method-button" class="text-button">How to read this →</button>
+  <a class="skip-link" href="#dashboard">Skip to course dashboard</a>
+  <main id="dashboard">
+    <header class="site-header">
+      <div class="brand"><p class="eyebrow">CONFIGURABLE PLANNING SIGNAL</p><h1 id="site-title">Course <em>Signal</em></h1><p id="institution-name" class="subtitle">Loading institution configuration…</p></div>
+      <button id="method-button" class="button button-secondary" aria-haspopup="dialog">How this works <span aria-hidden="true">↗</span></button>
     </header>
-    <section class="controls" aria-label="Course controls">
-      <label>Course <select id="course-select"></select></label>
-      <label>Compare <select id="term-select"><option>Fall</option><option>Spring</option><option>Summer</option><option>Winter</option></select></label>
-      <span id="coverage" class="coverage"></span>
+
+    <section class="control-bar" aria-label="Course controls">
+      <label>Course <select id="course-select" aria-describedby="course-help"></select><span id="course-help" class="sr-only">Choose a course.</span></label>
+      <label>Compare <select id="term-select"></select></label>
+      <div class="control-context"><span id="coverage" class="coverage">Loading history…</span><span>Comparable terms only</span></div>
     </section>
-    <p id="error" class="error" hidden></p>
-    <section class="hero-grid">
-      <article class="chart-card"><div class="card-head"><div><p class="kicker">HISTORICAL SIGNAL</p><h2>Completed-grade headcount</h2></div><span id="course-title"></span></div><div id="chart" role="img" aria-label="Historical course headcount chart"></div><p class="footnote">Observed students receiving a final grade; withdrawals are excluded. Gaps are not zeros.</p></article>
-      <aside class="forecast-card"><p class="kicker">NEXT COMPARABLE TERM</p><div id="forecast"><p class="muted">Loading estimate…</p></div><div class="divider"></div><p class="small">This is a planning signal—not a seat-capacity, waitlist, or autonomous decision tool.</p></aside>
+
+    <p id="error" class="error" role="alert" hidden></p>
+
+    <section class="readiness" aria-label="Data status">
+      <div class="readiness-item"><span class="status-dot status-ready" aria-hidden="true"></span><div><strong>Historical signal ready</strong><span id="history-status">Loading source record…</span></div></div>
+      <div class="readiness-item"><span id="live-dot" class="status-dot status-pending" aria-hidden="true"></span><div><strong id="live-status-title">Live overlay checking</strong><span id="live-status-detail">Looking for a verified cached snapshot…</span></div></div>
+      <span class="readiness-note">Not a capacity or waitlist forecast</span>
     </section>
-    <section class="lower-grid">
-      <article class="panel"><p class="kicker">CREDIBILITY CHECK</p><h2>Latest historical backtest</h2><div id="backtest"><p class="muted">Loading…</p></div></article>
-      <article class="panel"><p class="kicker">PRESENT-TENSE OVERLAY</p><h2>Current section status</h2><div id="status"><p class="muted">Loading cached snapshot…</p></div></article>
+
+    <section class="summary-grid" aria-label="Course summary">
+      <article class="summary-card"><p class="kicker">RECENT OBSERVED CHANGE</p><div id="trend-summary"><p class="loading">Loading history…</p></div></article>
+      <article class="summary-card summary-primary"><p class="kicker">NEXT COMPARABLE TERM</p><div id="forecast"><p class="loading">Calculating estimate…</p></div></article>
+      <article class="summary-card"><p class="kicker">MODEL CHECK</p><div id="backtest"><p class="loading">Loading backtest…</p></div></article>
     </section>
-    <section id="method" class="method" hidden><button id="close-method" class="close">×</button><h2>What this actually measures</h2><p>Historical values are aggregated public records of students receiving a final grade in a CS course, compared like-for-like by calendar term. The estimate selects the best of three deliberately simple methods using historic backtests. It does not know seats, capacity, waitlists, rooms, staffing, or individual student intent.</p></section>
+
+    <section class="dashboard-grid">
+      <article class="panel chart-panel">
+        <div class="panel-heading"><div><p class="kicker">HISTORICAL SIGNAL</p><h2 id="measurement-title">Observed headcount</h2></div><span id="course-title" class="course-title"></span></div>
+        <p id="chart-summary" class="chart-summary" aria-live="polite">Loading chart summary…</p>
+        <div id="chart" role="img" aria-describedby="chart-summary chart-description"></div>
+        <p id="chart-description" class="footnote">Observed course-term measurement. Gaps are not zeros.</p>
+        <details class="data-details"><summary>View comparable-term values as a table</summary><div id="history-table"></div></details>
+      </article>
+
+      <aside class="panel status-panel" aria-labelledby="status-heading">
+        <div class="panel-heading"><div><p class="kicker">PRESENT-TENSE OVERLAY</p><h2 id="status-heading">Current section status</h2></div><span id="status-badge" class="badge badge-neutral">Checking</span></div>
+        <div id="status"><p class="loading">Loading current-status snapshot…</p></div>
+        <div class="status-rule"><strong>Interpret carefully.</strong> Open/closed is categorical status only; it does not reveal numeric capacity or waitlist demand.</div>
+      </aside>
+    </section>
+
+    <section class="interpretation" aria-labelledby="interpretation-heading">
+      <div><p class="kicker">DECISION-SUPPORT GUARDRAIL</p><h2 id="interpretation-heading">A signal to investigate—not a recommendation to act.</h2></div>
+        <p id="planning-note">This view becomes useful when it is paired with local planning context that the configured source does not contain.</p>
+    </section>
   </main>
+
+  <dialog id="method" class="method-dialog" aria-labelledby="method-title">
+    <button id="close-method" class="close" aria-label="Close explanation">×</button>
+    <p class="kicker">METHOD &amp; LIMITS</p><h2 id="method-title">What this view knows—and what it does not.</h2>
+    <p id="modal-measurement">Historical values use the configured institution source and compare like-for-like academic terms. The estimate selects the strongest of three simple methods using historical backtests.</p>
+    <p class="summary-meta">Source: <span id="source-detail">Loading source…</span></p>
+    <div class="method-columns"><div><h3>It can show</h3><ul><li>Comparable-term history from the configured source</li><li>A transparent estimate and historic error</li><li>An optional verified current-status snapshot</li></ul></div><div><h3>It cannot show</h3><ul><li>Unprovided capacity, fill rate, or waitlist size</li><li>Local staffing, rooms, or curriculum constraints</li><li>Individual student intent or an automatic decision</li></ul></div></div>
+  </dialog>
   <script src="app.js"></script>
 </body>
 </html>
-

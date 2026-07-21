@@ -17,9 +17,10 @@ def dashboard():
 
 @app.get("/<path:filename>")
 def asset(filename: str):
-    if filename in {"app.js", "styles.css"}:
-        return send_from_directory(server.APP_DIR, filename)
-    return ("Not found", 404)
+    # Static assets are copied into the app directory during the Vercel build.
+    # Keep API paths above this route, then let Flask safely resolve nested
+    # assets such as entry.css, manifest.json, and assets/*.svg.
+    return send_from_directory(server.APP_DIR, filename)
 
 
 @app.get("/api/health")

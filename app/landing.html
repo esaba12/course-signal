@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A transparent planning signal for course planning conversations.">
+  <meta name="theme-color" content="#16212c">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Course Signal — Transparent planning signals">
+  <meta property="og:description" content="Turn comparable course history into a transparent planning conversation.">
+  <meta property="og:image" content="/assets/course-signal-social.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Course Signal — Transparent planning signals">
+  <meta name="twitter:description" content="Turn comparable course history into a transparent planning conversation.">
+  <meta name="twitter:image" content="/assets/course-signal-social.svg">
+  <title>Course Signal</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/course-signal-mark.svg">
+  <link rel="apple-touch-icon" href="/assets/course-signal-mark.svg">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="entry.css">
+</head>
+<body class="landing-page">
+  <main>
+    <section id="entry-screen" class="entry-screen" aria-labelledby="entry-title">
+      <div class="entry-shell">
+        <div class="entry-topline">
+          <div class="entry-brand-lockup"><img src="/assets/course-signal-mark.svg" width="48" height="48" alt=""><span>Course <em>Signal</em></span></div>
+          <span class="entry-status">Public demo · no account required</span>
+        </div>
+        <div class="entry-hero">
+          <div class="entry-copy">
+            <p class="eyebrow">CONFIGURABLE PLANNING SIGNAL</p>
+            <h1 id="entry-title">Make the next planning conversation clearer.</h1>
+            <p class="entry-lede">Course Signal turns comparable course history into a transparent signal for registrars, planners, and advisors—without pretending to know what the data cannot show.</p>
+            <div class="entry-actions">
+              <button id="enter-demo" class="button button-primary" type="button">Explore the UIUC demo <span aria-hidden="true">→</span></button>
+              <button id="open-access" class="button button-secondary" type="button">Sign in</button>
+            </div>
+            <p class="entry-note">The demo is open for judging. Sign-in and organization access are previewed without collecting account data.</p>
+          </div>
+          <div class="entry-signal-card" aria-label="Course Signal capabilities">
+            <div class="signal-card-mark"><img src="/assets/course-signal-mark.svg" width="76" height="76" alt=""></div>
+            <p class="kicker">WHAT IT GIVES YOU</p>
+            <ul>
+              <li><strong>Comparable history</strong><span>Like-for-like academic terms</span></li>
+              <li><strong>Transparent estimate</strong><span>Backtested, inspectable methods</span></li>
+              <li><strong>Human guardrails</strong><span>Signals to investigate, not orders to follow</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="entry-grid">
+          <div class="entry-panel">
+            <p class="kicker">CHOOSE A DEMO ORGANIZATION</p>
+            <div class="organization-choice selected" data-organization="uiuc">
+              <div class="organization-icon"><span>UI</span></div>
+              <div><strong>University of Illinois Urbana-Champaign</strong><span>Course demand signals · demo workspace</span></div>
+              <span class="badge badge-ready">Demo</span>
+            </div>
+            <div class="theme-picker" aria-labelledby="theme-heading">
+              <div><p id="theme-heading" class="theme-picker-title">Organization color</p><p class="theme-picker-help">Preview how a partner brand can carry through the workspace.</p></div>
+              <div id="theme-options" class="theme-options" role="radiogroup" aria-label="Organization color"></div>
+            </div>
+          </div>
+          <div class="entry-panel entry-panel-links">
+            <button id="open-intake" class="entry-link" type="button"><span class="entry-link-icon">↗</span><span><strong>What we need from you</strong><small>See accepted planning files and quick sample findings.</small></span></button>
+            <button id="open-request" class="entry-link" type="button"><span class="entry-link-icon">+</span><span><strong>Request to join</strong><small>Tell us about your organization and planning workflow.</small></span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="access-dialog" class="method-dialog entry-dialog" aria-labelledby="access-dialog-title">
+    <button id="close-access" class="close" aria-label="Close sign in">×</button>
+    <p class="kicker">WORKSPACE ACCESS</p><h2 id="access-dialog-title">Sign in when your workspace is ready.</h2>
+    <p>Course Signal’s public demo is open now. This preview keeps access lightweight while institution workspaces are being set up.</p>
+    <label class="dialog-field">Work email<input id="access-email" type="email" placeholder="you@organization.org"></label>
+    <button id="continue-demo" class="button button-primary" type="button">Continue to the UIUC demo</button>
+    <p id="access-confirmation" class="form-confirmation" hidden>No account was created. You can continue exploring the public demo.</p>
+  </dialog>
+  <dialog id="request-dialog" class="method-dialog entry-dialog" aria-labelledby="request-dialog-title">
+    <button id="close-request" class="close" aria-label="Close request form">×</button>
+    <p class="kicker">REQUEST TO JOIN</p><h2 id="request-dialog-title">Bring your organization into Course Signal.</h2>
+    <p>Share the decision workflow you want to understand. This prototype shows the intake experience without sending or storing the form.</p>
+    <label class="dialog-field">Name<input id="request-name" type="text" placeholder="Alex Morgan"></label>
+    <label class="dialog-field">Organization<input id="request-organization" type="text" placeholder="Your institution"></label>
+    <label class="dialog-field">Work email<input id="request-email" type="email" placeholder="alex@organization.org"></label>
+    <label class="dialog-field">Role<input id="request-role" type="text" placeholder="Planning, operations, leadership"></label>
+    <label class="dialog-field">What would you like to understand?<textarea id="request-message" rows="3" placeholder="A sentence or two is enough"></textarea></label>
+    <button id="submit-request" class="button button-primary" type="button">Send request</button>
+    <p id="request-confirmation" class="form-confirmation" hidden>Thanks—your request is ready for review. In this prototype, nothing was sent externally.</p>
+  </dialog>
+  <dialog id="intake-dialog" class="method-dialog entry-dialog intake-dialog" aria-labelledby="intake-dialog-title">
+    <button id="close-intake" class="close" aria-label="Close document intake">×</button>
+    <p class="kicker">WHAT WE NEED FROM YOU</p><h2 id="intake-dialog-title">Bring the files you already have.</h2>
+    <p>Start with enrollment history, course catalog or schedule exports, and planning priorities. The sample findings below illustrate the review experience.</p>
+    <div class="intake-dropzone"><strong>Add a planning document</strong><span>CSV, XLSX, or PDF · stays in this browser for the demo</span><input id="intake-files" type="file" accept=".csv,.xlsx,.pdf" multiple></div>
+    <div id="intake-files-list" class="intake-files-list"><button type="button" class="sample-file" data-sample-file="Enrollment history.csv"><strong>Enrollment history.csv</strong><span>Sample historical extract</span></button><button type="button" class="sample-file" data-sample-file="Course catalog.xlsx"><strong>Course catalog.xlsx</strong><span>Sample schedule export</span></button><button type="button" class="sample-file" data-sample-file="Planning priorities.pdf"><strong>Planning priorities.pdf</strong><span>Sample planning context</span></button></div>
+    <button id="show-findings" class="button button-primary" type="button" disabled>Show quick findings</button>
+    <div id="intake-findings" class="intake-findings" hidden><div class="demo-output-note">Demo output · illustrative only, not production analysis.</div><article><strong>Demand gap</strong><h3>Advanced sections carry the clearest growth signal.</h3><p>Recent observed headcount is rising faster in upper-level offerings than in the rest of the sample.</p></article><article><strong>Missing context</strong><h3>Capacity and instructor availability need a source.</h3><p>Those constraints are not represented in the uploaded planning files.</p></article><article><strong>Next action</strong><h3>Start with a section-level capacity check.</h3><p>Use the signal as a prompt for a human planning conversation.</p></article></div>
+  </dialog>
+  <script src="app.js"></script>
+</body>
+</html>

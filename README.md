@@ -48,3 +48,7 @@ Use the [institution onboarding guide](docs/INSTITUTION-ONBOARDING.md) with regi
 For the product story and the reason UIUC appears in the demo, see [product pitch](docs/PRODUCT-PITCH.md) and [UIUC demo adapter](docs/UIUC-DEMO.md).
 
 For automated browser QA, see [Playwright tests](docs/PLAYWRIGHT.md).
+
+## OpenAI Build Week
+
+Course Signal is entered in the Education track. See the [submission checklist](docs/DEVPOST-SUBMISSION.md) for the demo path, required links, and a concise record of how Codex contributed during the submission period.

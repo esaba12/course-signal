@@ -1,7 +1,34 @@
 const { test, expect } = require('@playwright/test');
 
+async function enterDemo(page) {
+  await page.getByRole('button', { name: /Explore the UIUC demo/i }).click();
+  await expect(page.locator('#entry-screen')).toHaveClass(/is-hidden/);
+}
+
+test('public entry screen offers UIUC demo, themes, and intake links', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: /Make the next planning conversation clearer/i })).toBeVisible();
+  await expect(page.getByText(/University of Illinois Urbana-Champaign/i)).toBeVisible();
+  await expect(page.locator('.theme-option')).toHaveCount(4);
+  await page.locator('.theme-option[data-theme-id="indigo"]').click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'indigo');
+  await page.getByRole('button', { name: /What we need from you/i }).click();
+  await expect(page.locator('#intake-dialog')).toBeVisible();
+  await page.locator('[data-sample-file="Enrollment history.csv"]').click();
+  await page.getByRole('button', { name: /Show quick findings/i }).click();
+  await expect(page.locator('#intake-findings')).toBeVisible();
+  await page.getByRole('button', { name: /Close document intake/i }).click();
+  await page.getByRole('button', { name: /Request to join/i }).click();
+  await page.locator('#request-name').fill('Alex Morgan');
+  await page.locator('#request-organization').fill('Example University');
+  await page.locator('#request-email').fill('alex@example.edu');
+  await page.getByRole('button', { name: /Send request/i }).click();
+  await expect(page.locator('#request-confirmation')).toBeVisible();
+});
+
 test('configured institution path renders historical signal, estimate, and backtest', async ({ page }) => {
   await page.goto('/');
+  await enterDemo(page);
   await expect(page.getByRole('heading', { name: /Course Signal/i })).toBeVisible();
 
   const course = page.locator('#course-select');
@@ -21,6 +48,7 @@ test('configured institution path renders historical signal, estimate, and backt
 
 test('method explanation is accessible from the dashboard', async ({ page }) => {
   await page.goto('/');
+  await enterDemo(page);
   await page.getByRole('button', { name: /How this works/i }).click();
   await expect(page.locator('#method')).toBeVisible();
   await expect(page.locator('#method')).toContainText('Unprovided capacity, fill rate, or waitlist size');
@@ -28,6 +56,7 @@ test('method explanation is accessible from the dashboard', async ({ page }) => 
 
 test('planner can compare, inspect, and save a course for review', async ({ page }) => {
   await page.goto('/');
+  await enterDemo(page);
   await page.locator('#course-search').fill('ENG 201');
   await page.locator('[data-course="ENG 201"]').click();
   await expect(page.locator('.comparison-card')).toHaveCount(2);

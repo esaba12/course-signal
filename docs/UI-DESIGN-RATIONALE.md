@@ -1,6 +1,6 @@
 # UI Design Rationale
 
-Updated 2026-07-19. This redesign follows the project’s [data dictionary](DATA-DICTIONARY.md), [model card](MODEL-CARD.md), and [integration decisions](INTEGRATION-DECISIONS.md).
+Updated 2026-07-19. This redesign follows the project’s [data dictionary](DATA-DICTIONARY.md), [model card](MODEL-CARD.md), and source-status guardrails in the dashboard.
 
 ## Product decisions reflected in the UI
 

@@ -5,6 +5,71 @@ const courseSearch = $('course-search');
 const escaped = (value) => String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 const state = { institution: null, courses: [], primary: '', selected: [], data: new Map(), review: {}, reviewCourse: '' };
 
+const THEMES = {
+  signal: { name: 'Signal', description: 'Course Signal default', orange: '#f65f0a', orangeDark: '#ba3e00', orangeSoft: '#fff0e5', teal: '#006b82', tealSoft: '#e4f2f3', ink: '#16212c' },
+  indigo: { name: 'Indigo', description: 'Academic blue', orange: '#536dfe', orangeDark: '#304ffe', orangeSoft: '#e9edff', teal: '#4455a5', tealSoft: '#eef0ff', ink: '#1c2440' },
+  teal: { name: 'Teal', description: 'Modern green-blue', orange: '#00897b', orangeDark: '#00695c', orangeSoft: '#e3f6f2', teal: '#006b67', tealSoft: '#e4f5f2', ink: '#132d2d' },
+  gold: { name: 'Gold', description: 'Warm institutional', orange: '#b7791f', orangeDark: '#7a4d0d', orangeSoft: '#fff3d6', teal: '#87631f', tealSoft: '#fff7e6', ink: '#302518' },
+};
+
+function setTheme(themeId) {
+  const theme = THEMES[themeId] || THEMES.signal;
+  const root = document.documentElement;
+  root.style.setProperty('--orange', theme.orange);
+  root.style.setProperty('--orange-dark', theme.orangeDark);
+  root.style.setProperty('--orange-soft', theme.orangeSoft);
+  root.style.setProperty('--teal', theme.teal);
+  root.style.setProperty('--teal-soft', theme.tealSoft);
+  root.style.setProperty('--ink', theme.ink);
+  root.style.setProperty('--brand', theme.orange);
+  root.style.setProperty('--brand-dark', theme.orangeDark);
+  root.dataset.theme = themeId;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme.ink);
+  localStorage.setItem('course-signal-theme', themeId);
+  document.querySelectorAll('[data-theme-id]').forEach(button => {
+    const selected = button.dataset.themeId === themeId;
+    button.setAttribute('aria-checked', String(selected));
+  });
+}
+
+function closeDialog(id) { $(id)?.close(); }
+
+function initEntry() {
+  const themeOptions = $('theme-options');
+  themeOptions.innerHTML = Object.entries(THEMES).map(([id, theme]) => `<button type="button" class="theme-option" data-theme-id="${id}" role="radio" aria-checked="false"><span class="theme-swatch" style="background:${theme.orange}"></span><strong>${theme.name}</strong><small>${theme.description}</small></button>`).join('');
+  themeOptions.addEventListener('click', event => {
+    const option = event.target.closest('[data-theme-id]');
+    if (option) setTheme(option.dataset.themeId);
+  });
+  setTheme(localStorage.getItem('course-signal-theme') || 'signal');
+
+  const entry = $('entry-screen');
+  const enterDemo = () => { entry.classList.add('is-hidden'); entry.setAttribute('aria-hidden', 'true'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  $('enter-demo').addEventListener('click', enterDemo);
+  $('continue-demo').addEventListener('click', () => { closeDialog('access-dialog'); $('access-confirmation').hidden = false; enterDemo(); });
+  $('open-access').addEventListener('click', () => $('access-dialog').showModal());
+  $('open-request').addEventListener('click', () => $('request-dialog').showModal());
+  $('open-intake').addEventListener('click', () => $('intake-dialog').showModal());
+  $('close-access').addEventListener('click', () => closeDialog('access-dialog'));
+  $('close-request').addEventListener('click', () => closeDialog('request-dialog'));
+  $('close-intake').addEventListener('click', () => closeDialog('intake-dialog'));
+
+  $('submit-request').addEventListener('click', () => {
+    const required = ['request-name', 'request-organization', 'request-email'].map(id => $(id).value.trim());
+    if (!required[0] || !required[1] || !required[2].includes('@')) return;
+    $('request-confirmation').hidden = false;
+  });
+
+  const selectedFiles = new Set();
+  const updateIntake = () => {
+    document.querySelectorAll('[data-sample-file]').forEach(button => button.classList.toggle('is-selected', selectedFiles.has(button.dataset.sampleFile)));
+    $('show-findings').disabled = selectedFiles.size === 0;
+  };
+  document.querySelectorAll('[data-sample-file]').forEach(button => button.addEventListener('click', () => { selectedFiles.add(button.dataset.sampleFile); updateIntake(); }));
+  $('intake-files').addEventListener('change', event => { Array.from(event.target.files || []).forEach(file => selectedFiles.add(file.name)); updateIntake(); });
+  $('show-findings').addEventListener('click', () => { $('intake-findings').hidden = false; $('show-findings').textContent = 'Findings ready'; });
+}
+
 async function api(path) {
   const response = await fetch(path);
   const data = await response.json();
@@ -191,4 +256,5 @@ $('copy-link').addEventListener('click', async () => { updateUrl(); await naviga
 $('export-csv').addEventListener('click', exportCsv);
 $('method-button').addEventListener('click', () => $('method').showModal()); $('close-method').addEventListener('click', () => $('method').close());
 $('close-review').addEventListener('click', () => $('review-dialog').close()); $('save-review').addEventListener('click', saveReview);
+initEntry();
 start();

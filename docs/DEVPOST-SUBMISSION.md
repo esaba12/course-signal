@@ -16,6 +16,8 @@ The recommended category is **Education**: Course Signal helps registrars, plann
 
 ## Suggested demo path (under three minutes)
 
+Use the full [demo script](DEMO-SCRIPT.md) when recording; it includes the narration, screen actions, algorithm explanation, and claims to avoid.
+
 1. Open the public Course Signal entry screen and select the UIUC demo.
 2. Briefly show the organization color presets and the “What we need from you” prototype.
 3. Search for a course and change the comparable term.

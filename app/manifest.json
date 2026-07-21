@@ -1,0 +1,13 @@
+{
+  "name": "Course Signal",
+  "short_name": "Course Signal",
+  "description": "Transparent planning signals for course teams.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F3ED",
+  "theme_color": "#16212C",
+  "icons": [
+    { "src": "/assets/course-signal-mark.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "/assets/course-signal-mark-mono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "monochrome" }
+  ]
+}

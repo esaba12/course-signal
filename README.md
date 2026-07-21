@@ -31,9 +31,9 @@ Then visit `http://localhost:8000`.
 - `app/` — one-screen dashboard.
 - `data/live_status.json` — optional cached Course Explorer snapshot fixture.
 
-Read [the demo runbook](docs/HACKATHON-RUNBOOK.md) before presenting.
+Read the [demo checklist](docs/DEMO-CHECKLIST.md) before presenting.
 
-Useful companion docs: [data dictionary](docs/DATA-DICTIONARY.md), [pitch](docs/PITCH.md), and [integration decisions](docs/INTEGRATION-DECISIONS.md).
+Useful companion docs: [data dictionary](docs/DATA-DICTIONARY.md), [model card](docs/MODEL-CARD.md), and [pitch](docs/PITCH.md).
 
 For a local-first demo and hosted backup plan, see [deployment](docs/DEPLOYMENT.md).
 
@@ -43,7 +43,7 @@ Public demo: [course-signal-demo.vercel.app](https://course-signal-demo.vercel.a
 
 Before presenting, run `python3 audit_data.py` and use the [demo checklist](docs/DEMO-CHECKLIST.md).
 
-Use the [institution onboarding guide](docs/INSTITUTION-ONBOARDING.md) with registrars and planners before adding an institution. The [customer-discovery guide](docs/CUSTOMER-DISCOVERY.md) helps establish the decision workflow first.
+For product scope and measurement guardrails, see the [product pitch](docs/PRODUCT-PITCH.md), [model card](docs/MODEL-CARD.md), and [data dictionary](docs/DATA-DICTIONARY.md).
 
 For the product story and the reason UIUC appears in the demo, see [product pitch](docs/PRODUCT-PITCH.md) and [UIUC demo adapter](docs/UIUC-DEMO.md).
 

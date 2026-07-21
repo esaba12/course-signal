@@ -15,7 +15,7 @@ Open `http://localhost:8000`. This is the most reliable option after the source 
 
 ## Render deployment (backup)
 
-1. Push the project to a private GitHub repository with the included PR-only workflow.
+1. Push the project to a public GitHub repository with the included checks workflow.
 2. Create a Render account/service from that repository.
 3. Render detects `render.yaml`; confirm its build command is `python3 ingest.py` and its health check is `/api/health`.
 4. Open the deployed URL and verify `/api/health`, CS 225, and the forecast/backtest cards.
@@ -34,4 +34,3 @@ Open `http://localhost:8000`. This is the most reliable option after the source 
 - `/api/health` shows a current ingestion record.
 - At least three hero courses render with chart, estimate, and backtest.
 - Source, measurement caveat, and status timestamp/unavailability are visible.
-

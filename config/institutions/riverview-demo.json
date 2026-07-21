@@ -8,12 +8,15 @@
   "measurement": {
     "label": "Recorded enrollment",
     "short_label": "recorded students",
+    "value_unit": "students",
     "description": "Observed recorded enrollment supplied by this institution's fixture dataset."
   },
   "source": {
     "adapter": "canonical_csv",
     "path": "data/fixtures/riverview-course-terms.csv",
-    "url": "local fixture for adapter verification"
+    "url": "local fixture for adapter verification",
+    "display_name": "Riverview canonical CSV fixture",
+    "kind": "adapter test fixture"
   },
   "capabilities": {"current_status": false}
 }

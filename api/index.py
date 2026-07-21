@@ -31,7 +31,7 @@ def health():
 
 @app.get("/api/institution")
 def institution():
-    keys = ("id", "name", "dashboard_title", "measurement", "terms", "default_course", "capabilities")
+    keys = ("id", "name", "dashboard_title", "measurement", "source", "terms", "default_course", "capabilities")
     return jsonify({key: server.INSTITUTION[key] for key in keys})
 
 

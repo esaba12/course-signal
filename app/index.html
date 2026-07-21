@@ -46,22 +46,23 @@
 
       <aside class="panel status-panel" aria-labelledby="status-heading">
         <div class="panel-heading"><div><p class="kicker">PRESENT-TENSE OVERLAY</p><h2 id="status-heading">Current section status</h2></div><span id="status-badge" class="badge badge-neutral">Checking</span></div>
-        <div id="status"><p class="loading">Loading cached snapshot…</p></div>
+        <div id="status"><p class="loading">Loading current-status snapshot…</p></div>
         <div class="status-rule"><strong>Interpret carefully.</strong> Open/closed is categorical status only; it does not reveal numeric capacity or waitlist demand.</div>
       </aside>
     </section>
 
     <section class="interpretation" aria-labelledby="interpretation-heading">
       <div><p class="kicker">DECISION-SUPPORT GUARDRAIL</p><h2 id="interpretation-heading">A signal to investigate—not a recommendation to act.</h2></div>
-      <p id="planning-note">This view becomes useful when it is paired with curriculum, staffing, room, and student-support context that the public dataset does not contain.</p>
+        <p id="planning-note">This view becomes useful when it is paired with local planning context that the configured source does not contain.</p>
     </section>
   </main>
 
   <dialog id="method" class="method-dialog" aria-labelledby="method-title">
     <button id="close-method" class="close" aria-label="Close explanation">×</button>
     <p class="kicker">METHOD &amp; LIMITS</p><h2 id="method-title">What this view knows—and what it does not.</h2>
-    <p>Historical values aggregate public records of students receiving a final grade, compared like-for-like by calendar term. The estimate selects the strongest of three simple methods using historical backtests.</p>
-    <div class="method-columns"><div><h3>It can show</h3><ul><li>Comparable-term completed-grade history</li><li>A transparent estimate and historic error</li><li>A verified cached Open/Closed snapshot, when available</li></ul></div><div><h3>It cannot show</h3><ul><li>Seats, fill rate, or waitlist size</li><li>Staffing, rooms, or curriculum constraints</li><li>Individual student intent or a decision to add/cut a class</li></ul></div></div>
+    <p id="modal-measurement">Historical values use the configured institution source and compare like-for-like academic terms. The estimate selects the strongest of three simple methods using historical backtests.</p>
+    <p class="summary-meta">Source: <span id="source-detail">Loading source…</span></p>
+    <div class="method-columns"><div><h3>It can show</h3><ul><li>Comparable-term history from the configured source</li><li>A transparent estimate and historic error</li><li>An optional verified current-status snapshot</li></ul></div><div><h3>It cannot show</h3><ul><li>Unprovided capacity, fill rate, or waitlist size</li><li>Local staffing, rooms, or curriculum constraints</li><li>Individual student intent or an automatic decision</li></ul></div></div>
   </dialog>
   <script src="app.js"></script>
 </body>

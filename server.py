@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dependency-free API and static server for the UIUC CS Course Signal prototype."""
+"""Dependency-free API and static server for a configured Course Signal deployment."""
 
 from __future__ import annotations
 
@@ -101,12 +101,12 @@ def live_status(code: str) -> dict:
     if not INSTITUTION.get("capabilities", {}).get("current_status"):
         return {"available": False, "message": f"{INSTITUTION['name']} has not enabled a current-status connector. Historical planning signals remain available."}
     if not LIVE_STATUS_PATH.exists():
-        return {"available": False, "message": "No cached Course Explorer snapshot has been loaded yet. The historical dashboard remains fully usable."}
+        return {"available": False, "message": "No verified current-status snapshot has been loaded yet. The historical dashboard remains fully usable."}
     try:
         snapshot = json.loads(LIVE_STATUS_PATH.read_text())
         course_snapshot = snapshot.get(code.upper()) if isinstance(snapshot, dict) else None
         if not isinstance(course_snapshot, dict):
-            return {"available": False, "message": "No verified cached Course Explorer snapshot is loaded for this course."}
+            return {"available": False, "message": "No verified current-status snapshot is loaded for this course."}
         return {"available": True, **course_snapshot}
     except (json.JSONDecodeError, OSError):
         return {"available": False, "message": "Cached status snapshot could not be read."}
@@ -137,7 +137,7 @@ class Handler(SimpleHTTPRequestHandler):
                     run = dict(db.execute("SELECT * FROM ingestion_run ORDER BY id DESC LIMIT 1").fetchone())
                 return self.send_json({"ok": True, "institution": INSTITUTION["id"], "ingestion": run})
             if parsed.path == "/api/institution":
-                return self.send_json({key: INSTITUTION[key] for key in ("id", "name", "dashboard_title", "measurement", "terms", "default_course", "capabilities")})
+                return self.send_json({key: INSTITUTION[key] for key in ("id", "name", "dashboard_title", "measurement", "source", "terms", "default_course", "capabilities")})
             if parsed.path == "/api/courses":
                 with connection() as db:
                     rows = db.execute("SELECT course_code, MAX(course_title) AS title, COUNT(*) AS term_count FROM course_term_aggregate WHERE institution_id=? GROUP BY course_code ORDER BY course_code", (INSTITUTION["id"],)).fetchall()

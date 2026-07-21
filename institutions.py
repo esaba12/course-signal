@@ -11,7 +11,8 @@ CONFIG_DIR = ROOT / "config" / "institutions"
 
 
 def institution_id() -> str:
-    return os.environ.get("COURSE_SIGNAL_INSTITUTION", "uiuc").strip().lower()
+    # UIUC is selected explicitly by the hosted demo; the core has a neutral default.
+    return os.environ.get("COURSE_SIGNAL_INSTITUTION", "riverview-demo").strip().lower()
 
 
 def load_institution(identifier: str | None = None) -> dict:

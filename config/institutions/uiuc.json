@@ -8,12 +8,15 @@
   "measurement": {
     "label": "Completed-grade headcount",
     "short_label": "students receiving a final grade",
+    "value_unit": "students",
     "description": "Observed students receiving a final grade; withdrawals are excluded."
   },
   "source": {
     "adapter": "uiuc_gpa_csv",
     "path": "data/uiuc-gpa-dataset.csv",
-    "url": "https://raw.githubusercontent.com/wadefagen/datasets/main/gpa/uiuc-gpa-dataset.csv"
+    "url": "https://raw.githubusercontent.com/wadefagen/datasets/main/gpa/uiuc-gpa-dataset.csv",
+    "display_name": "UIUC public GPA dataset",
+    "kind": "public demo source"
   },
   "capabilities": {"current_status": true}
 }

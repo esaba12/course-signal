@@ -43,4 +43,6 @@ Before presenting, run `python3 audit_data.py` and use the [demo checklist](docs
 
 Use the [institution onboarding guide](docs/INSTITUTION-ONBOARDING.md) with registrars and planners before adding an institution. The [customer-discovery guide](docs/CUSTOMER-DISCOVERY.md) helps establish the decision workflow first.
 
+For the product story and the reason UIUC appears in the demo, see [product pitch](docs/PRODUCT-PITCH.md) and [UIUC demo adapter](docs/UIUC-DEMO.md).
+
 For automated browser QA, see [Playwright tests](docs/PLAYWRIGHT.md).

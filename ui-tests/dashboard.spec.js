@@ -25,3 +25,20 @@ test('method explanation is accessible from the dashboard', async ({ page }) => 
   await expect(page.locator('#method')).toBeVisible();
   await expect(page.locator('#method')).toContainText('Unprovided capacity, fill rate, or waitlist size');
 });
+
+test('planner can compare, inspect, and save a course for review', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#course-search').fill('ENG 201');
+  await page.locator('[data-course="ENG 201"]').click();
+  await expect(page.locator('.comparison-card')).toHaveCount(2);
+  await page.locator('[data-review="ENG 201"]').click();
+  await page.locator('#review-note').fill('Check the next offering against writing-program constraints.');
+  await page.locator('#save-review').click();
+  await expect(page.locator('#review-list')).toContainText('Check the next offering');
+  await expect(page.locator('#review-count')).toContainText('1 saved');
+  await page.locator('.bar[data-term-index="0"]').click();
+  await expect(page.locator('#term-detail')).toContainText('2020-fa');
+  await page.reload();
+  await expect(page.locator('#review-list')).toContainText('Check the next offering');
+  await expect(page).toHaveURL(/courses=MATH\+101%2CENG\+201/);
+});

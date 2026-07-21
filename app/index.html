@@ -16,10 +16,14 @@
     </header>
 
     <section class="control-bar" aria-label="Course controls">
-      <label>Course <select id="course-select" aria-describedby="course-help"></select><span id="course-help" class="sr-only">Choose a course.</span></label>
+      <label>Focus course <select id="course-select" aria-describedby="course-help"></select><span id="course-help" class="sr-only">Choose the primary course for the signal.</span></label>
       <label>Compare <select id="term-select"></select></label>
+      <label class="course-search-label">Add comparison <input id="course-search" type="search" autocomplete="off" placeholder="Search course code or title" aria-controls="course-results"><span id="course-help-search" class="sr-only">Search for another course to compare.</span></label>
       <div class="control-context"><span id="coverage" class="coverage">Loading history…</span><span>Comparable terms only</span></div>
     </section>
+
+    <div id="course-results" class="course-results" role="listbox" aria-label="Course search results" hidden></div>
+    <div id="compare-chips" class="compare-chips" aria-label="Courses in comparison"></div>
 
     <p id="error" class="error" role="alert" hidden></p>
 
@@ -35,6 +39,11 @@
       <article class="summary-card"><p class="kicker">MODEL CHECK</p><div id="backtest"><p class="loading">Loading backtest…</p></div></article>
     </section>
 
+    <section class="comparison-panel panel" aria-labelledby="comparison-heading">
+      <div class="panel-heading"><div><p class="kicker">SIDE-BY-SIDE REVIEW</p><h2 id="comparison-heading">Compare selected courses</h2></div><button id="copy-link" class="button button-secondary" type="button">Copy view link</button></div>
+      <div id="comparison-grid" class="comparison-grid"><p class="loading">Select another course to compare.</p></div>
+    </section>
+
     <section class="dashboard-grid">
       <article class="panel chart-panel">
         <div class="panel-heading"><div><p class="kicker">HISTORICAL SIGNAL</p><h2 id="measurement-title">Observed headcount</h2></div><span id="course-title" class="course-title"></span></div>
@@ -42,6 +51,7 @@
         <div id="chart" role="img" aria-describedby="chart-summary chart-description"></div>
         <p id="chart-description" class="footnote">Observed course-term measurement. Gaps are not zeros.</p>
         <details class="data-details"><summary>View comparable-term values as a table</summary><div id="history-table"></div></details>
+        <div id="term-detail" class="term-detail" aria-live="polite"><p class="summary-meta">Select a bar or table row to inspect a term.</p></div>
       </article>
 
       <aside class="panel status-panel" aria-labelledby="status-heading">
@@ -49,6 +59,12 @@
         <div id="status"><p class="loading">Loading current-status snapshot…</p></div>
         <div class="status-rule"><strong>Interpret carefully.</strong> Open/closed is categorical status only; it does not reveal numeric capacity or waitlist demand.</div>
       </aside>
+    </section>
+
+    <section class="workspace-panel panel" aria-labelledby="review-heading">
+      <div class="panel-heading"><div><p class="kicker">PLANNING WORKSPACE</p><h2 id="review-heading">Review queue</h2></div><div class="workspace-actions"><span id="review-count" class="badge badge-neutral">0 saved</span><button id="export-csv" class="button button-secondary" type="button">Export CSV</button></div></div>
+      <p class="footnote">Save courses for a planning conversation. Notes stay in this browser until an institution enables shared storage.</p>
+      <div id="review-list" class="review-list"><p class="summary-meta">No courses saved for review.</p></div>
     </section>
 
     <section class="interpretation" aria-labelledby="interpretation-heading">
@@ -63,6 +79,14 @@
     <p id="modal-measurement">Historical values use the configured institution source and compare like-for-like academic terms. The estimate selects the strongest of three simple methods using historical backtests.</p>
     <p class="summary-meta">Source: <span id="source-detail">Loading source…</span></p>
     <div class="method-columns"><div><h3>It can show</h3><ul><li>Comparable-term history from the configured source</li><li>A transparent estimate and historic error</li><li>An optional verified current-status snapshot</li></ul></div><div><h3>It cannot show</h3><ul><li>Unprovided capacity, fill rate, or waitlist size</li><li>Local staffing, rooms, or curriculum constraints</li><li>Individual student intent or an automatic decision</li></ul></div></div>
+  </dialog>
+  <dialog id="review-dialog" class="method-dialog" aria-labelledby="review-dialog-title">
+    <button id="close-review" class="close" aria-label="Close review editor">×</button>
+    <p class="kicker">PLANNING WORKSPACE</p><h2 id="review-dialog-title">Save course for review</h2>
+    <p id="review-course-label" class="summary-meta"></p>
+    <label class="dialog-field">Status<select id="review-status"><option value="saved">Saved</option><option value="discussed">Discussed</option><option value="dismissed">Dismissed</option></select></label>
+    <label class="dialog-field">Note<textarea id="review-note" rows="5" placeholder="What should the planning team look into?"></textarea></label>
+    <button id="save-review" class="button button-primary" type="button">Save review</button>
   </dialog>
   <script src="app.js"></script>
 </body>

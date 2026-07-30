@@ -2,6 +2,10 @@
 
 A configurable, per-institution planning-signal prototype. UIUC is the demo data adapter; the product identity and deployment are institution-neutral.
 
+![Course Signal demo](docs/media/coursesignal-demo.gif)
+
+▶ [Watch with sound](https://ethansaba.com/videos/coursesignal.mp4) — "Make the next planning conversation clearer."
+
 ## Important scope
 
 This is an advisor-facing planning signal—not a capacity forecast, waitlist predictor, or automated decision-maker. Historical headcount is the sum of students receiving a final grade; it excludes withdrawals and does not equal initial enrollment or seat capacity.

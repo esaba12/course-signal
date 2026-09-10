@@ -1,1 +1,0 @@
-Course Signal turns historical enrollment data into an advisor-facing planning signal — configurable per institution, with UIUC as the live demo. It refuses to fake a capacity forecast, and says so.

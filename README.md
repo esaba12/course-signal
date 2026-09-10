@@ -1,58 +1,125 @@
 # Course Signal
 
-A configurable, per-institution planning-signal prototype. UIUC is the demo data adapter; the product identity and deployment are institution-neutral.
+An advisor-facing planning tool that reads a school's own course history and makes the next
+scheduling conversation clearer. Institution-neutral by design — UIUC is the demo adapter,
+not the product.
+
+[![Checks](https://github.com/esaba12/course-signal/actions/workflows/checks.yml/badge.svg)](https://github.com/esaba12/course-signal/actions/workflows/checks.yml)
 
 ![Course Signal demo](docs/media/coursesignal-demo.gif)
 
 ▶ [Watch with sound](https://ethansaba.com/videos/coursesignal.mp4) — "Make the next planning conversation clearer."
+· **[Live demo](https://course-signal-demo.vercel.app)**
+
+## What it does
+
+- **Reads historical enrollment** per course and term, and surfaces the trend an advisor
+  would otherwise reconstruct by hand.
+- **Works for any institution** — a school is a JSON config declaring its data sources and
+  measurement definitions, not a code change.
+- **Isolates institutions completely** — each one ingests into its own database, so a demo
+  adapter can never bleed into another school's numbers.
+- **Ships a one-screen dashboard** with no build step and no runtime dependencies.
+- **States what it doesn't know** — see below.
 
 ## Important scope
 
-This is an advisor-facing planning signal—not a capacity forecast, waitlist predictor, or automated decision-maker. Historical headcount is the sum of students receiving a final grade; it excludes withdrawals and does not equal initial enrollment or seat capacity.
+This is an advisor-facing planning **signal** — not a capacity forecast, a waitlist
+predictor, or an automated decision-maker. Historical headcount is the sum of students
+receiving a final grade: it excludes withdrawals, and it does **not** equal initial
+enrollment or seat capacity.
+
+Live status snapshots are deliberately cached, timestamped, and reviewed before use. They
+are never presented as continuously monitored data, because they aren't.
+
+## Architecture
+
+An adapter pattern: adding a school means adding a config file, never touching ingest.
+
+```mermaid
+flowchart TD
+    CFG["config/institutions/*.json - sources + measurement definitions"]
+    SRC["Upstream data (UIUC GPA dataset)"]
+    SNAP["data/live_status.json - cached, reviewed snapshot"]
+
+    ING["ingest.py - download, validate, aggregate"]
+    VAL["validate_institution.py - config conformance"]
+    DB[("Per-institution SQLite DB")]
+    SRV["server.py - dependency-free API + static host"]
+    APP["app/ - one-screen dashboard"]
+
+    CFG --> VAL
+    CFG --> ING
+    SRC --> ING
+    SNAP --> ING
+    ING --> DB
+    DB --> SRV
+    SRV --> APP
+```
 
 ## Run locally
 
 ```bash
-python3 ingest.py --institution uiuc
-python3 server.py
+python3 ingest.py --institution uiuc    # downloads + caches the dataset on first run
+python3 server.py                       # http://localhost:8000
 ```
 
-Then visit `http://localhost:8000`.
+Pass `--refresh` to re-download rather than use the cached CSV.
 
-`ingest.py` downloads the UIUC GPA dataset on its first run and builds an institution-isolated database. Subsequent runs use the cached CSV unless `--refresh` is supplied. To verify the portable reference deployment, run `python3 validate_institution.py --institution riverview-demo` and `python3 ingest.py --institution riverview-demo`, then start with `COURSE_SIGNAL_INSTITUTION=riverview-demo python3 server.py`.
+To verify the portable reference deployment — the proof that nothing is UIUC-specific:
+
+```bash
+python3 validate_institution.py --institution riverview-demo
+python3 ingest.py --institution riverview-demo
+COURSE_SIGNAL_INSTITUTION=riverview-demo python3 server.py
+```
+
+## Notable decisions
+
+**A school is a config file, not a fork.** `config/institutions/*.json` declares sources and
+measurement definitions; `ingest.py` is adapter-driven and reads them. `riverview-demo` is a
+synthetic institution that exists purely to prove UIUC assumptions haven't leaked into the
+engine — and CI builds it on every push.
+
+**Cached beats live when live would be a lie.** Course Explorer status is fetched into a
+reviewed, timestamped snapshot rather than polled. A dashboard that implies real-time data
+it doesn't have is worse than one that shows a date.
+
+**The measurement definition ships with the number.** Headcount is grade-receiving
+students, which is not enrollment — so the data dictionary and model card are part of the
+product, not appendices. An advisor acting on a misread number is the actual failure mode.
+
+**No build step, no runtime dependencies.** `server.py` is a plain Python API and static
+host, so the demo runs anywhere Python does and can't break on a stale lockfile.
+
+## Tests
+
+CI compiles every script, builds the neutral fixture database from scratch, runs the
+`unittest` suite, and drives the dashboard through Playwright in Chromium.
+
+```bash
+python -m unittest discover -s tests -v
+python3 audit_data.py          # run before presenting
+```
+
+## Documentation
+
+| Doc | What it covers |
+|---|---|
+| [Product pitch](docs/PRODUCT-PITCH.md) | Product story, and why UIUC appears in the demo |
+| [Model card](docs/MODEL-CARD.md) | Measurement guardrails and stated limitations |
+| [Data dictionary](docs/DATA-DICTIONARY.md) | Field-by-field definitions |
+| [UIUC demo adapter](docs/UIUC-DEMO.md) | What the demo adapter does and doesn't assume |
+| [Demo checklist](docs/DEMO-CHECKLIST.md) | Run before presenting |
+| [Deployment](docs/DEPLOYMENT.md) · [Vercel](docs/VERCEL.md) | Local-first demo and serverless hosting |
+| [Playwright](docs/PLAYWRIGHT.md) | Browser QA setup |
 
 ## Data credits
 
 - Historical data: [wadefagen/datasets](https://github.com/wadefagen/datasets), UIUC GPA dataset.
-- Planned live-status source: UIUC Course Explorer. Live snapshots are intentionally cached, timestamped, and never presented as continuously monitored.
+- Planned live-status source: UIUC Course Explorer.
 
-## Project map
+## Origin
 
-- `config/institutions/` — isolated institution configuration and source/measurement definitions.
-- `ingest.py` — adapter-driven download, validation, aggregation, and storage.
-- `ingest_live_snapshot.py` — validates a deliberately cached, reviewed status snapshot.
-- `server.py` — dependency-free local API and dashboard server.
-- `app/` — one-screen dashboard.
-- `data/live_status.json` — optional cached Course Explorer snapshot fixture.
-
-Read the [demo checklist](docs/DEMO-CHECKLIST.md) before presenting.
-
-Useful companion docs: [data dictionary](docs/DATA-DICTIONARY.md), [model card](docs/MODEL-CARD.md), and [pitch](docs/PITCH.md).
-
-For a local-first demo and hosted backup plan, see [deployment](docs/DEPLOYMENT.md).
-
-For a Vercel serverless deployment, see [Vercel deployment](docs/VERCEL.md).
-
-Public demo: [course-signal-demo.vercel.app](https://course-signal-demo.vercel.app) (UIUC is explicitly configured as the demo adapter).
-
-Before presenting, run `python3 audit_data.py` and use the [demo checklist](docs/DEMO-CHECKLIST.md).
-
-For product scope and measurement guardrails, see the [product pitch](docs/PRODUCT-PITCH.md), [model card](docs/MODEL-CARD.md), and [data dictionary](docs/DATA-DICTIONARY.md).
-
-For the product story and the reason UIUC appears in the demo, see [product pitch](docs/PRODUCT-PITCH.md) and [UIUC demo adapter](docs/UIUC-DEMO.md).
-
-For automated browser QA, see [Playwright tests](docs/PLAYWRIGHT.md).
-
-## OpenAI Build Week
-
-Course Signal is entered in the Education track. See the [submission checklist](docs/DEVPOST-SUBMISSION.md) for the demo path, required links, and a concise record of how Codex contributed during the submission period.
+Built for OpenAI Build Week, Education track — then generalized past the hackathon into an
+institution-neutral tool. [Submission checklist](docs/DEVPOST-SUBMISSION.md).
